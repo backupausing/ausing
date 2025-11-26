@@ -22,13 +22,37 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      colors: {
+colors: {
+        // ... tieni i colori standard (background, foreground, primary, etc) se vuoi ...
+        
+        // AGGIUNGI QUESTI COLORI PERSONALIZZATI:
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
+        // ... (altri colori standard shadcn) ...
+
+        // --- I TUOI COLORI DI BRAND (Aggiunti ora) ---
+        ionian: {
+          DEFAULT: "#2C3E50", // Un blu scuro profondo (Mar Ionio)
+          foreground: "#FFFFFF",
+        },
+        terracotta: {
+          DEFAULT: "#E07A5F", // Arancione bruciato tipico
+          foreground: "#FFFFFF",
+        },
+        sand: {
+          DEFAULT: "#F4F1EA", // Sabbia chiaro
+        },
+        cream: {
+          DEFAULT: "#F9F6EF", // Crema (lo sfondo che ti piaceva)
+        },
+      },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
