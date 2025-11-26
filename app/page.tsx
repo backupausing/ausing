@@ -2,11 +2,14 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 // Forza l'aggiornamento dei dati a ogni visita (così vedi le modifiche admin subito)
-export const revalidate = 0; 
+export const revalidate = 0;
 
 export default async function Home() {
-  // 1. Scarichiamo le ville dal DB Supabase
-  const { data: villas } = await supabase.from("villas").select("*");
+  // AGGIUNTO: .eq('is_visible', true)
+  const { data: villas } = await supabase
+    .from("villas")
+    .select("*")
+    .eq('is_visible', true); 
 
   if (!villas) return <div className="p-20 text-center">Caricamento ville...</div>;
 
