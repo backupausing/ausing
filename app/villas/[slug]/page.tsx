@@ -1,18 +1,19 @@
-import { villas } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import ContactForm from "@/components/ContactForm";
-import AvailabilityCalendar from "@/components/AvailabilityCalendar"; // Import nuovo
-import ReviewsSection from "@/components/ReviewsSection"; // Import nuovo
+import AvailabilityCalendar from "@/components/AvailabilityCalendar";
+import ReviewsSection from "@/components/ReviewsSection";
 
-export async function generateStaticParams() {
-  return villas.map((villa) => ({
-    slug: villa.slug,
-  }));
-}
+export const revalidate = 0; // Importante per vedere subito le modifiche fatte in admin
 
-export default function VillaPage({ params }: { params: { slug: string } }) {
-  const villa = villas.find((v) => v.slug === params.slug);
+export default async function VillaPage({ params }: { params: { slug: string } }) {
+  // Scarica la singola villa dal DB usando lo slug
+  const { data: villa } = await supabase
+    .from("villas")
+    .select("*")
+    .eq("slug", params.slug)
+    .single();
 
   if (!villa) {
     notFound();
@@ -43,13 +44,15 @@ export default function VillaPage({ params }: { params: { slug: string } }) {
           <div className="lg:col-span-2 space-y-10">
             <section>
               <h2 className="text-2xl font-serif text-ionian mb-4">La Struttura</h2>
-              <p className="text-lg leading-relaxed text-ionian/80">{villa.description}</p>
+              <p className="text-lg leading-relaxed text-ionian/80 whitespace-pre-wrap">
+                {villa.description}
+              </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-serif text-ionian mb-4">Cosa troverai</h2>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {villa.services.map((service, index) => (
+                {villa.services.map((service: string, index: number) => (
                   <li key={index} className="flex items-center gap-2 text-ionian/70">
                     <span className="w-2 h-2 rounded-full bg-terracotta" />
                     {service}
@@ -65,20 +68,14 @@ export default function VillaPage({ params }: { params: { slug: string } }) {
               </p>
             </section>
 
-            {/* NUOVA SEZIONE RECENSIONI */}
             <ReviewsSection villaId={villa.id} />
           </div>
 
-          {/* COLONNA DESTRA (Sticky) */}
+          {/* COLONNA DESTRA */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-8">
-              
-              {/* Form di contatto */}
               <ContactForm villaId={villa.id} villaName={villa.name} />
-              
-              {/* NUOVO CALENDARIO */}
               <AvailabilityCalendar villaId={villa.id} />
-
               <div className="mt-6 text-center text-xs text-ionian/50">
                 <p>AUSING garantisce la qualità della struttura.</p>
               </div>
