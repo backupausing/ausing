@@ -9,28 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/react-accordion": "latest",
-    "@radix-ui/react-alert-dialog": "latest",
-    "@radix-ui/react-aspect-ratio": "latest",
-    "@radix-ui/react-avatar": "latest",
-    "@radix-ui/react-dialog": "latest",
-    "@supabase/supabase-js": "latest",
-    "class-variance-authority": "latest",
-    "classnames": "latest",
-    "embla-carousel-react": "latest",
-    "lucide-react": "latest",
     "next": "15.0.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-day-picker": "latest"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "@supabase/supabase-js": "^2.43.0",
+    "classnames": "^2.5.1",
+    "class-variance-authority": "^0.7.0",
+    "embla-carousel-react": "^8.1.7",
+    "react-day-picker": "^8.8.0",
+    "lucide-react": "^0.344.0",
+    "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
+    "@radix-ui/react-aspect-ratio": "^1.1.0",
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-dialog": "^1.1.1"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "18.2.0",
-    "@types/react-dom": "18.2.0",
-    "autoprefixer": "latest",
-    "postcss": "latest",
-    "tailwindcss": "latest",
-    "typescript": "5.4.0"
+    "typescript": "^5.7.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "tailwindcss": "^3.4.14",
+    "postcss": "^8.4.33",
+    "autoprefixer": "^10.4.17"
   }
 }
