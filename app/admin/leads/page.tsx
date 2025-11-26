@@ -4,7 +4,20 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function LeadsAdmin() {
-  const [leads, setLeads] = useState([]);
+type Lead = {
+  id: string;
+  name: string;
+  phone: string;
+  message?: string;
+  villa_id?: string;
+  created_at?: string;
+  villa?: {
+    name: string;
+  };
+};
+
+const [leads, setLeads] = useState<Lead[]>([]);
+
 
   useEffect(() => {
     supabase
