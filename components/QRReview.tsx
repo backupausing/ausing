@@ -8,19 +8,22 @@ export default function QRReview({ slug }: { slug: string }) {
   const [img, setImg] = useState("");
 
   useEffect(() => {
-    const link = `${typeof window !== "undefined" ? window.location.origin : ""}/reviews/${slug}`;
+    const link = `${process.env.NEXT_PUBLIC_SITE_URL}/reviews/${slug}`;
     setUrl(link);
 
-    QRCode.toDataURL(link, { width: 220 }, (err, qr) => {
-      if (!err) setImg(qr);
-    });
+    QRCode.toDataURL(
+      link,
+      { width: 220 },
+      (_err: any, qr: string) => {
+        setImg(qr);
+      }
+    );
   }, [slug]);
 
   return (
-    <div className="text-center space-y-2 py-4">
-      <h3 className="font-serif text-ionian text-sm">QR per Recensioni</h3>
-      {img && <img src={img} alt="QR Aus" className="mx-auto w-40 h-40" />}
-      <p className="text-[10px] text-ionian/60">{url}</p>
+    <div className="flex flex-col items-center gap-4">
+      <img src={img} alt="QR code" className="rounded-lg shadow" />
+      <p className="text-sm text-ionian/70">{url}</p>
     </div>
   );
 }
