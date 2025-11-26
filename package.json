@@ -5,23 +5,32 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
-    "classnames": "^2.5.1",
+    "@radix-ui/react-accordion": "latest",
+    "@radix-ui/react-alert-dialog": "latest",
+    "@radix-ui/react-aspect-ratio": "latest",
+    "@radix-ui/react-avatar": "latest",
+    "@radix-ui/react-dialog": "latest",
+    "@supabase/supabase-js": "latest",
+    "class-variance-authority": "latest",
+    "classnames": "latest",
+    "embla-carousel-react": "latest",
+    "lucide-react": "latest",
     "next": "15.0.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "@radix-ui/react-alert-dialog": "^1.0.5",
-    "@radix-ui/react-accordion": "^1.0.4",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-aspect-ratio": "^1.0.3",
-    "@radix-ui/react-avatar": "^1.0.3",
-    "class-variance-authority": "^0.7.0",
-    "react-day-picker": "^8.10.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.31",
-    "autoprefixer": "^10.4.16"
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-day-picker": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "18.2.0",
+    "@types/react-dom": "18.2.0",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest",
+    "typescript": "5.4.0"
   }
 }
