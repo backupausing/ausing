@@ -10,9 +10,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (pathname === "/admin/login") return <>{children}</>;
 
   const menu = [
+    { name: "Le Mie Ville", href: "/admin/villas" },
     { name: "Richieste (Leads)", href: "/admin" },
-    { name: "Recensioni", href: "/admin/reviews" },
     { name: "Calendario", href: "/admin/calendar" },
+    { name: "Recensioni", href: "/admin/reviews" },
   ];
 
   return (
