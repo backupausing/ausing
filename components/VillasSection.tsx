@@ -7,7 +7,15 @@ import VillaCard from "./VillaCard";
 
 export default function VillasSection() {
   const { t } = useLang();
-  const [villas, setVillas] = useState([]);
+ type Villa = {
+  id: string;
+  slug: string;
+  name: Record<string, string>;
+  description: Record<string, string>;
+  images: string[];
+};
+
+const [villas, setVillas] = useState<Villa[]>([]);
 
   useEffect(() => {
     (async () => {
