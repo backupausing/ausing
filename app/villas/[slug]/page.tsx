@@ -1,89 +1,116 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import ContactForm from "@/components/ContactForm";
-import AvailabilityCalendar from "@/components/AvailabilityCalendar";
-import ReviewsSection from "@/components/ReviewsSection";
+import { useRouter } from "next/navigation";
 
-export const revalidate = 0; // Importante per vedere subito le modifiche fatte in admin
+export default function EditVillaPage({ params }: { params: { slug: string } }) {
+  const [villa, setVilla] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-export default async function VillaPage({ params }: { params: { slug: string } }) {
-  // Scarica la singola villa dal DB usando lo slug
-  const { data: villa } = await supabase
-    .from("villas")
-    .select("*")
-    .eq("slug", params.slug)
-    .single();
+  // Carica i dati della villa
+  useEffect(() => {
+    supabase.from("villas").select("*").eq("slug", params.slug).single()
+      .then(({ data }) => setVilla(data));
+  }, [params.slug]);
 
-  if (!villa) {
-    notFound();
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+
+    // I servizi sono salvati come array, ma nel form li modifichiamo come testo separato da virgola
+    const servicesString = formData.get("services") as string;
+    const servicesArray = servicesString.split(",").map(s => s.trim()).filter(s => s !== "");
+
+    const updates = {
+      name: formData.get("name"),
+      description: formData.get("description"),
+      host: formData.get("host"),
+      image: formData.get("image"), // Per ora URL dell'immagine
+      price_range: formData.get("price_range"),
+      services: servicesArray
+    };
+
+    const { error } = await supabase
+      .from("villas")
+      .update(updates)
+      .eq("id", villa.id);
+
+    setLoading(false);
+    if (!error) {
+      alert("Villa aggiornata con successo!");
+      router.refresh();
+      router.push("/admin/villas");
+    } else {
+      alert("Errore durante l'aggiornamento");
+    }
   }
 
+  if (!villa) return <div>Caricamento...</div>;
+
   return (
-    <div className="min-h-screen bg-cream">
-      {/* Hero Image */}
-      <div className="h-[50vh] w-full relative bg-gray-200">
-        <img 
-          src={villa.image} 
-          alt={villa.name} 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/60 to-transparent">
-          <div className="max-w-7xl mx-auto">
-            <Link href="/" className="text-white/80 hover:text-white mb-2 inline-block text-sm">&larr; Torna alle ville</Link>
-            <h1 className="text-4xl md:text-5xl font-serif text-white">{villa.name}</h1>
-          </div>
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-3xl font-serif text-ionian mb-8">Modifica: {villa.name}</h1>
+      
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-border space-y-6">
+        
+        <div>
+          <label className="block text-sm font-medium mb-1">Nome Villa</label>
+          <input name="name" defaultValue={villa.name} className="w-full p-2 border rounded" required />
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          
-          {/* COLONNA SINISTRA */}
-          <div className="lg:col-span-2 space-y-10">
-            <section>
-              <h2 className="text-2xl font-serif text-ionian mb-4">La Struttura</h2>
-              <p className="text-lg leading-relaxed text-ionian/80 whitespace-pre-wrap">
-                {villa.description}
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-serif text-ionian mb-4">Cosa troverai</h2>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {villa.services.map((service: string, index: number) => (
-                  <li key={index} className="flex items-center gap-2 text-ionian/70">
-                    <span className="w-2 h-2 rounded-full bg-terracotta" />
-                    {service}
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="bg-sand/30 p-6 rounded-xl border border-border">
-              <h3 className="font-serif text-xl text-ionian mb-2">Il tuo Host: {villa.host}</h3>
-              <p className="text-sm text-ionian/70">
-                {villa.host} si prenderà cura del tuo arrivo e ti darà i migliori consigli locali.
-              </p>
-            </section>
-
-            <ReviewsSection villaId={villa.id} />
-          </div>
-
-          {/* COLONNA DESTRA */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8 space-y-8">
-              <ContactForm villaId={villa.id} villaName={villa.name} />
-              <AvailabilityCalendar villaId={villa.id} />
-              <div className="mt-6 text-center text-xs text-ionian/50">
-                <p>AUSING garantisce la qualità della struttura.</p>
-              </div>
-            </div>
-          </div>
-
+        <div>
+          <label className="block text-sm font-medium mb-1">Host</label>
+          <input name="host" defaultValue={villa.host} className="w-full p-2 border rounded" required />
         </div>
-      </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">URL Immagine</label>
+          <input name="image" defaultValue={villa.image} className="w-full p-2 border rounded" required />
+          <p className="text-xs text-gray-500 mt-1">Incolla qui il link di una foto (es. da Unsplash)</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Fascia Prezzo (€, €€, €€€)</label>
+          <input name="price_range" defaultValue={villa.price_range} className="w-full p-2 border rounded" required />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Descrizione</label>
+          <textarea name="description" defaultValue={villa.description} rows={6} className="w-full p-2 border rounded" required />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Servizi (separati da virgola)</label>
+          <textarea 
+            name="services" 
+            defaultValue={villa.services.join(", ")} 
+            rows={3} 
+            className="w-full p-2 border rounded" 
+          />
+          <p className="text-xs text-gray-500 mt-1">Esempio: Wi-Fi, Piscina, Parcheggio</p>
+        </div>
+
+        <div className="pt-4 flex gap-4">
+          <button 
+            type="button" 
+            onClick={() => router.back()}
+            className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50"
+          >
+            Annulla
+          </button>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="px-6 py-2 bg-ionian text-white rounded hover:bg-ionian/90"
+          >
+            {loading ? "Salvataggio..." : "Salva Modifiche"}
+          </button>
+        </div>
+
+      </form>
     </div>
   );
 }
