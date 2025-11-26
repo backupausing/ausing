@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useState } from "react";
 
 export default function ContactPage() {
-  const { t } = useLang();
+  const { t } = useLang() as any;
   const [status, setStatus] = useState("idle");
 
 async function sendLead(e: React.FormEvent<HTMLFormElement>) {
