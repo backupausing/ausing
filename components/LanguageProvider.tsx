@@ -1,46 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { Locale, defaultLocale, messages } from "@/lib/i18n";
+import { createContext, useContext, useState } from "react";
 
-type LangContextType = {
-  locale: Locale;
-  setLocale: (l: Locale) => void;
-  t: typeof messages[Locale];
-};
+const LanguageContext = createContext({
+  locale: "it",
+  setLocale: (l: string) => {}
+});
 
-const LangContext = createContext<LangContextType | null>(null);
-
-export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const [locale, setLocaleState] = useState<Locale>(defaultLocale);
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem("ausing_locale") as Locale | null;
-    if (stored) setLocaleState(stored);
-  }, []);
-
-  const setLocale = (l: Locale) => {
-    setLocaleState(l);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("ausing_locale", l);
-    }
-  };
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [locale, setLocale] = useState("it");
 
   return (
-    <LangContext.Provider
-      value={{
-        locale,
-        setLocale,
-        t: messages[locale]
-      }}
-    >
+    <LanguageContext.Provider value={{ locale, setLocale }}>
       {children}
-    </LangContext.Provider>
+    </LanguageContext.Provider>
   );
-};
+}
 
-export const useLang = () => {
-  const ctx = useContext(LangContext);
-  if (!ctx) throw new Error("useLang must be used within LanguageProvider");
-  return ctx;
-};
+export const useLang = () => useContext(LanguageContext);
