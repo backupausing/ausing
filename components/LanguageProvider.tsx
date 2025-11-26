@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 // Assicurati che questo percorso sia giusto. 
 // Se hai messo il file in 'ausing/lib/translations.ts', questo import funzionerà.
-import { messages, type Locale, defaultLocale, locales } from "@/lib/translations";
+import { messages, type Locale, defaultLocale, locales } from "../lib/translations";
 
 // Definiamo cosa offre il nostro contesto
 type LanguageContextType = {
