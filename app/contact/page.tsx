@@ -9,22 +9,21 @@ export default function ContactPage() {
   const [status, setStatus] = useState("idle");
 
 async function sendLead(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus("sending");
+  e.preventDefault();
+  setStatus("sending");
 
-    const data = new FormData(e.target);
+  const form = e.currentTarget; // <-- Questo è il form tipizzato correttamente
+  const data = new FormData(form);
 
-    await supabase.from("leads").insert({
-      name: data.get("name"),
-      phone: data.get("phone"),
-      message: data.get("message"),
-      villa_id: null
-    });
+  await supabase.from("leads").insert({
+    name: data.get("name"),
+    phone: data.get("phone"),
+    message: data.get("message"),
+  });
 
-    setStatus("sent");
-    e.target.reset();
-  }
-
+  setStatus("sent");
+  form.reset();
+}
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
       <h1 className="font-serif text-3xl mb-4 text-ionian">{t.contactUs}</h1>
