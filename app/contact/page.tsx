@@ -8,7 +8,7 @@ export default function ContactPage() {
   const { t } = useLang();
   const [status, setStatus] = useState("idle");
 
-  async function sendLead(e) {
+async function sendLead(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
 
