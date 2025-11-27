@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Richieste (Leads)", href: "/admin" },
     { name: "Calendario", href: "/admin/calendar" },
     { name: "Recensioni", href: "/admin/reviews" },
+    { name: "Impostazioni Sito", href: "/admin/settings" },
   ];
 
   return (
