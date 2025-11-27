@@ -4,7 +4,7 @@ export default function TermsPage() {
       <h1 className="text-4xl font-serif text-ionian mb-8">Termini e Condizioni</h1>
       <div className="prose prose-lg text-gray-600">
         <p>AUSING agisce come vetrina per ville private.</p>
-        <p>Le prenotazioni non avvengono online ma tramite accordo diretto tra ospite e host.</p>
+        <p>Le prenotazioni non avvengono online ma tramite accordo diretto tra ospite e gestore.</p>
         <p>Ogni struttura è responsabile dei servizi offerti.</p>
         {/* ... Qui puoi incollare i termini completi ... */}
       </div>
