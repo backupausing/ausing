@@ -2,96 +2,95 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import Link from "next/link";
 
-export default function AdminVillasList() {
-  const [villas, setVillas] = useState<any[]>([]);
+export default function AdminDashboard() {
+  const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Carica i dati appena apri la pagina
   useEffect(() => {
-    loadVillas();
+    fetchLeads();
   }, []);
 
-  function loadVillas() {
-    // Qui carichiamo TUTTE le ville, anche quelle nascoste, ordinate per creazione
-    supabase.from("villas").select("*").order('created_at', { ascending: false }).then(({ data }) => {
-      if (data) setVillas(data);
-      setLoading(false);
-    });
-  }
-
-  // Funzione per accendere/spegnere la villa
-  async function toggleVisibility(id: string, currentStatus: boolean) {
-    const { error } = await supabase
-      .from("villas")
-      .update({ is_visible: !currentStatus })
-      .eq("id", id);
+  async function fetchLeads() {
+    // Scarichiamo le richieste e, grazie alla relazione nel DB, prendiamo anche il nome della villa!
+    const { data, error } = await supabase
+      .from("leads")
+      .select("*, villas(name)") 
+      .order("created_at", { ascending: false }); // I più recenti in alto
     
-    if (!error) {
-      // Aggiorna la lista locale senza ricaricare
-      setVillas(villas.map(v => v.id === id ? { ...v, is_visible: !currentStatus } : v));
-    }
+    if (error) console.error("Errore caricamento leads:", error);
+    if (data) setLeads(data);
+    setLoading(false);
   }
 
-  if (loading) return <div className="p-8">Caricamento ville...</div>;
+  // Funzione per segnare come "Gestito" (cambia colore)
+  async function toggleStatus(id: number, currentStatus: string) {
+    const newStatus = currentStatus === "new" ? "contacted" : "new";
+    
+    // Aggiorna Supabase
+    await supabase.from("leads").update({ status: newStatus }).eq("id", id);
+    
+    // Aggiorna la vista locale subito
+    setLeads(leads.map(l => l.id === id ? { ...l, status: newStatus } : l));
+  }
+
+  if (loading) return <div className="p-8">Caricamento richieste...</div>;
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-serif text-ionian">Le Mie Ville</h1>
+      <h1 className="text-3xl font-serif text-ionian mb-8">Richieste di Contatto</h1>
+      
+      <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th className="p-4 font-medium text-gray-500 text-sm">Data</th>
+              <th className="p-4 font-medium text-gray-500 text-sm">Nome Cliente</th>
+              <th className="p-4 font-medium text-gray-500 text-sm">Telefono</th>
+              <th className="p-4 font-medium text-gray-500 text-sm">Villa Richiesta</th>
+              <th className="p-4 font-medium text-gray-500 text-sm">Messaggio</th>
+              <th className="p-4 font-medium text-gray-500 text-sm">Azione</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {leads.map((lead) => (
+              <tr key={lead.id} className={`transition-colors ${lead.status === "contacted" ? "bg-gray-50/50" : "hover:bg-blue-50/30"}`}>
+                <td className="p-4 text-sm whitespace-nowrap text-gray-500">
+                  {new Date(lead.created_at).toLocaleDateString("it-IT", { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' })}
+                </td>
+                <td className="p-4 font-medium text-ionian">{lead.name}</td>
+                <td className="p-4 font-mono text-terracotta">{lead.phone}</td>
+                <td className="p-4 text-sm font-medium text-gray-700">
+                  {/* Se la relazione villas(name) funziona mostra il nome, altrimenti l'ID */}
+                  {lead.villas?.name || lead.villa_id}
+                </td>
+                <td className="p-4 text-sm text-gray-600 max-w-xs truncate" title={lead.message}>
+                  {lead.message || "-"}
+                </td>
+                <td className="p-4">
+                  <button
+                    onClick={() => toggleStatus(lead.id, lead.status)}
+                    className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+                      lead.status === "new"
+                        ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200 shadow-sm"
+                        : "bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200"
+                    }`}
+                  >
+                    {lead.status === "new" ? "DA CHIAMARE" : "Già Chiamato"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         
-        {/* TASTO CREA NUOVA */}
-        <Link 
-          href="/admin/villas/new" 
-          className="bg-terracotta text-white px-6 py-2 rounded-full font-medium hover:bg-terracotta/90 transition-colors shadow-md"
-        >
-          + Nuova Villa
-        </Link>
-      </div>
-
-      <div className="grid gap-4">
-        {villas.map((villa) => (
-          <div key={villa.id} className={`p-6 rounded-xl border flex justify-between items-center transition-all ${
-            villa.is_visible ? "bg-white border-border shadow-sm" : "bg-gray-50 border-gray-200 opacity-75 grayscale-[0.5]"
-          }`}>
-            <div className="flex items-center gap-4">
-              <img src={villa.image} className="w-16 h-16 object-cover rounded-lg bg-gray-200" alt={villa.name} />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-medium text-ionian">{villa.name}</h3>
-                  {/* Etichetta stato */}
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-bold tracking-wide ${
-                    villa.is_visible ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-500"
-                  }`}>
-                    {villa.is_visible ? "Pubblica" : "Nascosta"}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500">Host: {villa.host}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              {/* Switch Visibilità */}
-              <button
-                onClick={() => toggleVisibility(villa.id, villa.is_visible)}
-                className={`text-sm font-medium px-3 py-1 rounded border transition-colors ${
-                  villa.is_visible 
-                    ? "border-green-200 text-green-700 hover:bg-green-50" 
-                    : "border-gray-300 text-gray-600 hover:bg-white"
-                }`}
-              >
-                {villa.is_visible ? "Nascondi" : "Pubblica"}
-              </button>
-
-              <Link 
-                href={`/admin/villas/${villa.slug}`}
-                className="bg-ionian text-white px-5 py-2 rounded-md hover:bg-ionian/90 text-sm font-medium transition-colors"
-              >
-                Modifica
-              </Link>
-            </div>
+        {leads.length === 0 && (
+          <div className="p-12 text-center text-gray-400 flex flex-col items-center gap-2">
+            <span className="text-2xl">📭</span>
+            <p>Nessuna richiesta ricevuta ancora.</p>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
