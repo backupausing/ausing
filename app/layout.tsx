@@ -2,6 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google"; // Aggiungo un font Serif elegante
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+import ThemeManager from "@/components/ThemeManager";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
@@ -47,6 +49,22 @@ export default function RootLayout({
           <p className="font-serif text-lg mb-2">AUSING</p>
           <p>© 2025 Pisticci (MT) - Basilicata, Italia</p>
         </footer>
+      </body>
+    </html>
+  );
+}
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Scarica il tema dal DB (server side)
+  const { data } = await supabase.from("settings").select("palette_name").single();
+  const currentPalette = data?.palette_name || "classic";
+
+  return (
+    <html lang="it">
+      {/* Inserisci il ThemeManager qui */}
+      <ThemeManager paletteName={currentPalette} />
+      
+      <body className="...">
+         {/* ... resto del layout ... */}
       </body>
     </html>
   );
