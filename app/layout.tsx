@@ -4,6 +4,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import ThemeManager from "@/components/ThemeManager";
+import Analytics from "@/components/Analytics"; // <--- 1. IMPORT MANCANTE
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
@@ -13,20 +14,24 @@ export const metadata: Metadata = {
   description: "Collezione di Aus autentiche tra campagna e mare.",
 };
 
-// Facciamo diventare il layout async per leggere il DB
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // 1. Scarica il tema dal DB
-  const { data } = await supabase.from("settings").select("palette_name").single();
-  const currentPalette = data?.palette_name || "classic";
+  // 2. RECUPERO DATI (Selezioniamo tutto, inclusi gli ID analytics)
+  const { data: settings } = await supabase.from("settings").select("*").single();
+  const currentPalette = settings?.palette_name || "classic";
 
   return (
     <html lang="it">
-      {/* 2. Iniettiamo i colori dinamici */}
       <ThemeManager paletteName={currentPalette} />
+
+      {/* 3. COMPONENTE ANALYTICS (Inserito qui) */}
+      <Analytics 
+        gaId={settings?.google_analytics_id || ""} 
+        clarityId={settings?.microsoft_clarity_id || ""} 
+      />
 
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-cream text-ionian`}>
         
