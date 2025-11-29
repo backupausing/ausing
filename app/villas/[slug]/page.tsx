@@ -4,8 +4,29 @@ import Link from "next/link";
 import ContactForm from "@/components/ContactForm";
 import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import ReviewsSection from "@/components/ReviewsSection";
+import { Metadata } from "next"; // Importa Metadata
 
 export const revalidate = 0;
+
+// 1. GENERAZIONE METADATI SEO
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { data: villa } = await supabase.from("villas").select("*").eq("slug", params.slug).single();
+
+  if (!villa) {
+    return { title: "Villa non trovata" };
+  }
+
+  return {
+    title: `${villa.name} | AUSING`,
+    description: villa.description.substring(0, 160) + "...", // Primi 160 caratteri per Google
+    openGraph: {
+      title: villa.name,
+      description: `Scopri ${villa.name}, una splendida dimora autentica a Pisticci. Ospitata da ${villa.host}.`,
+      images: [villa.image], // L'immagine che apparirà su WhatsApp/Facebook
+      type: "website",
+    },
+  };
+}
 
 export default async function VillaPage({ params }: { params: { slug: string } }) {
   const { data: villa } = await supabase.from("villas").select("*").eq("slug", params.slug).single();
