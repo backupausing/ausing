@@ -4,29 +4,9 @@ import Link from "next/link";
 import ContactForm from "@/components/ContactForm";
 import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import ReviewsSection from "@/components/ReviewsSection";
-import { Metadata } from "next"; // Importa Metadata
+import { MapPin } from "lucide-react"; // Importiamo un'icona carina
 
 export const revalidate = 0;
-
-// 1. GENERAZIONE METADATI SEO
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { data: villa } = await supabase.from("villas").select("*").eq("slug", params.slug).single();
-
-  if (!villa) {
-    return { title: "Villa non trovata" };
-  }
-
-  return {
-    title: `${villa.name} | AUSING`,
-    description: villa.description.substring(0, 160) + "...", // Primi 160 caratteri per Google
-    openGraph: {
-      title: villa.name,
-      description: `Scopri ${villa.name}, una splendida dimora autentica a Pisticci. Ospitata da ${villa.host}.`,
-      images: [villa.image], // L'immagine che apparirà su WhatsApp/Facebook
-      type: "website",
-    },
-  };
-}
 
 export default async function VillaPage({ params }: { params: { slug: string } }) {
   const { data: villa } = await supabase.from("villas").select("*").eq("slug", params.slug).single();
@@ -58,7 +38,6 @@ export default async function VillaPage({ params }: { params: { slug: string } }
               <p className="text-lg leading-relaxed text-ionian/80 whitespace-pre-wrap font-light">{villa.description}</p>
             </section>
 
-            {/* GALLERIA FOTOGRAFICA (NUOVA SEZIONE) */}
             {villa.gallery && villa.gallery.length > 0 && (
               <section>
                 <h2 className="text-2xl font-serif text-ionian mb-6">Galleria</h2>
@@ -93,6 +72,33 @@ export default async function VillaPage({ params }: { params: { slug: string } }
                 <p className="text-ionian/70 leading-relaxed">{villa.host} è il custode di questa dimora...</p>
               </div>
             </section>
+
+            {/* --- NUOVO BOX MAPPA --- */}
+            {villa.map_url && (
+              <section className="rounded-2xl overflow-hidden border border-stone-200 shadow-sm relative h-64 bg-gray-100 group">
+                {/* Sfondo mappa statico (fake) per design */}
+                <div className="absolute inset-0 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=40.38,16.56&zoom=10&size=800x400&sensor=false&style=feature:all|saturation:-100')] bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity" />
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
+                  <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-lg max-w-sm w-full">
+                    <div className="flex items-center justify-center mb-3 text-terracotta">
+                      <MapPin size={32} />
+                    </div>
+                    <h3 className="font-serif text-xl text-ionian mb-2">Posizione</h3>
+                    <p className="text-sm text-gray-500 mb-4">Scopri dove si trova {villa.name}</p>
+                    <a 
+                      href={villa.map_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block w-full bg-ionian text-white py-2 rounded-lg font-medium hover:bg-terracotta transition-colors"
+                    >
+                      Ottieni indicazioni stradali →
+                    </a>
+                  </div>
+                </div>
+              </section>
+            )}
+            {/* ----------------------- */}
 
             <ReviewsSection villaId={villa.id} />
           </div>
