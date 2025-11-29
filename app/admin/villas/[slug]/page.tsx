@@ -20,8 +20,6 @@ export default function EditVillaPage({ params }: { params: { slug: string } }) 
     const formData = new FormData(e.currentTarget);
 
     const servicesArray = (formData.get("services") as string).split(",").map(s => s.trim()).filter(s => s !== "");
-    
-    // GESTIONE GALLERIA: Prende le righe o virgole e crea array
     const galleryString = formData.get("gallery") as string;
     const galleryArray = galleryString.split(/[\n,]+/).map(s => s.trim()).filter(s => s !== "");
 
@@ -32,7 +30,8 @@ export default function EditVillaPage({ params }: { params: { slug: string } }) 
       image: formData.get("image"),
       price_range: formData.get("price_range"),
       services: servicesArray,
-      gallery: galleryArray // <--- Salviamo la galleria
+      gallery: galleryArray,
+      map_url: formData.get("map_url") // <--- NUOVO CAMPO
     };
 
     const { error } = await supabase.from("villas").update(updates).eq("id", villa.id);
@@ -56,30 +55,33 @@ export default function EditVillaPage({ params }: { params: { slug: string } }) 
       </div>
       
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-border space-y-6">
-        {/* ... Campi esistenti (Nome, Host, Immagine, Prezzo, Descrizione) ... */}
-        {/* Ricopia i campi che c'erano prima qui in mezzo, per brevità ti metto solo quelli nuovi sotto */}
         
-        {/* Per comodità ti rimetto i campi base veloci se hai cancellato tutto */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div><label className="text-sm block mb-1">Nome</label><input name="name" defaultValue={villa.name} className="w-full p-2 border rounded" required /></div>
              <div><label className="text-sm block mb-1">Host</label><input name="host" defaultValue={villa.host} className="w-full p-2 border rounded" required /></div>
         </div>
+        
         <div><label className="text-sm block mb-1">Foto Copertina</label><input name="image" defaultValue={villa.image} className="w-full p-2 border rounded" required /></div>
         <div><label className="text-sm block mb-1">Prezzo</label><input name="price_range" defaultValue={villa.price_range} className="w-full p-2 border rounded" required /></div>
+        
+        {/* NUOVO CAMPO MAPPA */}
+        <div>
+          <label className="block text-sm font-medium mb-1 text-gray-700">Link Google Maps</label>
+          <input 
+            name="map_url" 
+            defaultValue={villa.map_url} 
+            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-terracotta/50 outline-none" 
+            placeholder="Es: https://goo.gl/maps/..."
+          />
+          <p className="text-xs text-gray-500 mt-1">Vai su Google Maps -> Cerca la posizione -> Condividi -> Copia link</p>
+        </div>
+
         <div><label className="text-sm block mb-1">Descrizione</label><textarea name="description" defaultValue={villa.description} rows={5} className="w-full p-2 border rounded" required /></div>
         <div><label className="text-sm block mb-1">Servizi</label><textarea name="services" defaultValue={villa.services?.join(", ")} className="w-full p-2 border rounded" /></div>
 
-        {/* CAMPO GALLERIA NUOVO */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <label className="block text-sm font-bold mb-2 text-ionian">Galleria Immagini (Opzionale)</label>
-          <p className="text-xs text-gray-500 mb-2">Incolla qui i link delle altre foto, uno per riga (o separati da virgola).</p>
-          <textarea 
-            name="gallery" 
-            defaultValue={villa.gallery ? villa.gallery.join("\n") : ""} 
-            rows={5} 
-            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-terracotta/50 outline-none font-mono text-sm" 
-            placeholder={"https://...\nhttps://..."}
-          />
+          <label className="block text-sm font-bold mb-2 text-ionian">Galleria Immagini</label>
+          <textarea name="gallery" defaultValue={villa.gallery ? villa.gallery.join("\n") : ""} rows={5} className="w-full p-2 border border-gray-300 rounded" placeholder={"https://...\nhttps://..."} />
         </div>
 
         <button type="submit" disabled={loading} className="px-6 py-2 bg-ionian text-white rounded hover:bg-ionian/90 w-full">
