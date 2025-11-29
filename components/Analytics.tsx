@@ -13,12 +13,16 @@ export default function Analytics({ gaId, clarityId }: Props) {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    // Controlla se c'è già una scelta salvata
+    // Controllo cookie
     const savedConsent = localStorage.getItem("cookie_consent");
+    
     if (savedConsent === "true") {
       setConsent(true);
     } else if (savedConsent === null) {
-      setShowBanner(true);
+      // Se non c'è scelta, mostra il banner dopo un breve ritardo 
+      // per evitare conflitti di idratazione
+      const timer = setTimeout(() => setShowBanner(true), 500);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -35,7 +39,7 @@ export default function Analytics({ gaId, clarityId }: Props) {
 
   return (
     <>
-      {/* Script Google Analytics (Caricati solo se consent=true) */}
+      {/* Script Google Analytics */}
       {consent && gaId && (
         <>
           <Script
@@ -53,7 +57,7 @@ export default function Analytics({ gaId, clarityId }: Props) {
         </>
       )}
 
-      {/* Script Microsoft Clarity (Caricati solo se consent=true) */}
+      {/* Script Microsoft Clarity */}
       {consent && clarityId && (
         <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
@@ -66,26 +70,34 @@ export default function Analytics({ gaId, clarityId }: Props) {
         </Script>
       )}
 
-      {/* Banner GDPR */}
+      {/* Banner GDPR - Z-Index altissimo e struttura fissa */}
       {showBanner && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50 flex flex-col md:flex-row items-center justify-between gap-4 max-w-7xl mx-auto">
-          <div className="text-sm text-gray-600">
-            <p className="font-bold text-gray-800 mb-1">Rispettiamo la tua privacy</p>
-            <p>Usiamo cookie tecnici e di analisi per migliorare l'esperienza. Accetti il tracciamento anonimo?</p>
-          </div>
-          <div className="flex gap-3">
-            <button 
-              onClick={declineCookies}
-              className="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors"
-            >
-              Solo necessari
-            </button>
-            <button 
-              onClick={acceptCookies}
-              className="px-6 py-2 bg-terracotta text-white rounded text-sm font-bold hover:opacity-90 transition-opacity shadow-md"
-            >
-              Accetta tutto
-            </button>
+        <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+          <div className="max-w-7xl mx-auto p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <div className="text-sm text-gray-600 text-center md:text-left">
+              <p className="font-bold text-gray-900 mb-1">Rispettiamo la tua privacy</p>
+              <p>
+                Questo sito utilizza cookie tecnici e di analisi anonima per offrirti un'esperienza migliore. 
+                Nessun dato viene venduto a terzi.
+              </p>
+            </div>
+
+            <div className="flex gap-3 shrink-0">
+              <button 
+                onClick={declineCookies}
+                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Solo necessari
+              </button>
+              <button 
+                onClick={acceptCookies}
+                className="px-6 py-2.5 bg-terracotta text-white rounded-lg text-sm font-bold hover:opacity-90 transition-opacity shadow-sm"
+              >
+                Accetta tutto
+              </button>
+            </div>
+
           </div>
         </div>
       )}
