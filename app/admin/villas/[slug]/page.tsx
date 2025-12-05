@@ -31,7 +31,7 @@ export default function EditVillaPage({ params }: { params: { slug: string } }) 
       price_range: formData.get("price_range"),
       services: servicesArray,
       gallery: galleryArray,
-      map_url: formData.get("map_url")
+      map_url: formData.get("map_url"),
       updated_at: new Date()
     };
 
