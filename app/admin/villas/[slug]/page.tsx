@@ -31,7 +31,8 @@ export default function EditVillaPage({ params }: { params: { slug: string } }) 
       price_range: formData.get("price_range"),
       services: servicesArray,
       gallery: galleryArray,
-      map_url: formData.get("map_url") // <--- NUOVO CAMPO
+      map_url: formData.get("map_url")
+      updated_at: new Date()
     };
 
     const { error } = await supabase.from("villas").update(updates).eq("id", villa.id);
