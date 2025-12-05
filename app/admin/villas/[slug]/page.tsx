@@ -1,22 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react"; // <--- Aggiunto 'use'
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { use } from "react";
 
+// Next.js 15: params è una Promise anche nei Client Components
 export default function EditVillaPage({ params }: { params: Promise<{ slug: string }> }) {
-  // Svolgiamo la promessa dei parametri
-  const { slug } = use(params); 
+  // Sspacchettiamo i parametri con use()
+  const { slug } = use(params);
 
   const [villa, setVilla] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Usiamo 'slug' invece di 'params.slug'
-    supabase.from("villas").select("*").eq("slug", slug).single()
-      .then(({ data }) => setVilla(data));
+    if (slug) {
+      supabase.from("villas").select("*").eq("slug", slug).single()
+        .then(({ data }) => setVilla(data));
+    }
   }, [slug]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -70,16 +71,9 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
         <div><label className="text-sm block mb-1">Foto Copertina</label><input name="image" defaultValue={villa.image} className="w-full p-2 border rounded" required /></div>
         <div><label className="text-sm block mb-1">Prezzo</label><input name="price_range" defaultValue={villa.price_range} className="w-full p-2 border rounded" required /></div>
         
-        {/* NUOVO CAMPO MAPPA */}
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-700">Link Google Maps</label>
-          <input 
-            name="map_url" 
-            defaultValue={villa.map_url} 
-            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-terracotta/50 outline-none" 
-            placeholder="Es: https://goo.gl/maps/..."
-          />
-          <p className="text-xs text-gray-500 mt-1">Vai su Google Maps -> Cerca la posizione -> Condividi -> Copia link</p>
+          <input name="map_url" defaultValue={villa.map_url} className="w-full p-2 border rounded" placeholder="Es: https://goo.gl/maps/..." />
         </div>
 
         <div><label className="text-sm block mb-1">Descrizione</label><textarea name="description" defaultValue={villa.description} rows={5} className="w-full p-2 border rounded" required /></div>
@@ -87,7 +81,7 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
 
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <label className="block text-sm font-bold mb-2 text-ionian">Galleria Immagini</label>
-          <textarea name="gallery" defaultValue={villa.gallery ? villa.gallery.join("\n") : ""} rows={5} className="w-full p-2 border border-gray-300 rounded" placeholder={"https://...\nhttps://..."} />
+          <textarea name="gallery" defaultValue={villa.gallery ? villa.gallery.join("\n") : ""} rows={5} className="w-full p-2 border rounded" placeholder={"https://...\nhttps://..."} />
         </div>
 
         <button type="submit" disabled={loading} className="px-6 py-2 bg-ionian text-white rounded hover:bg-ionian/90 w-full">
