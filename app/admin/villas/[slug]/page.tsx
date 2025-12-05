@@ -3,16 +3,21 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { use } from "react";
 
-export default function EditVillaPage({ params }: { params: { slug: string } }) {
+export default function EditVillaPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Svolgiamo la promessa dei parametri
+  const { slug } = use(params); 
+
   const [villa, setVilla] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    supabase.from("villas").select("*").eq("slug", params.slug).single()
+    // Usiamo 'slug' invece di 'params.slug'
+    supabase.from("villas").select("*").eq("slug", slug).single()
       .then(({ data }) => setVilla(data));
-  }, [params.slug]);
+  }, [slug]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
