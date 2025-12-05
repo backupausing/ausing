@@ -9,14 +9,15 @@ import { Metadata } from "next";
 
 export const revalidate = 0;
 
-// FIX NEXT.JS 15: params è Promise
+// Definizione del tipo per Next.js 15
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
 // 1. GENERAZIONE METADATI SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params; // <--- AWAIT QUI
+  const { slug } = await params; // <--- AWAIT QUI (Obbligatorio per Next 15)
+  
   const { data: villa } = await supabase.from("villas").select("*").eq("slug", slug).single();
 
   if (!villa) {
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // 2. COMPONENTE PAGINA
 export default async function VillaPage({ params }: Props) {
-  const { slug } = await params; // <--- AWAIT QUI
+  const { slug } = await params; // <--- AWAIT QUI (Obbligatorio per Next 15)
 
   const { data: villa } = await supabase.from("villas").select("*").eq("slug", slug).single();
 
