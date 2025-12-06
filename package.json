@@ -10,8 +10,8 @@
   },
 "dependencies": {
     "next": "latest",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "react": "latest",
+    "react-dom": "latest",
     "@supabase/supabase-js": "^2.43.0",
     "classnames": "^2.5.1",
     "class-variance-authority": "^0.7.0",
